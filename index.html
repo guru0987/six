@@ -1,1 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Banker's Algorithm Program</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f9;
+      margin: 20px;
+    }
+    h2 {
+      color: #333;
+      text-align: center;
+    }
+    pre {
+      background: #272822;
+      color: #f8f8f2;
+      padding: 20px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    code {
+      font-family: "Courier New", monospace;
+    }
+  </style>
+</head>
+<body>
+  <h2>Banker's Algorithm (C Program)</h2>
+  <pre><code>
+#include &lt;stdio.h&gt;
 
+int num_processes, num_resources;
+
+// Function to check if the system is in a safe state
+int is_safe(int available[], int max[][10], int allocation[][10], int need[][10], int safe_sequence[]) {
+    int work[num_resources];
+    int finish[num_processes];
+
+    // Initialize work with available resources
+    for (int i = 0; i &lt; num_resources; i++) {
+        work[i] = available[i];
+    }
+    
+    // Initialize finish array
+    for (int i = 0; i &lt; num_processes; i++) {
+        finish[i] = 0;
+    }
+
+    int count = 0;
+    while (count &lt; num_processes) {
+        int found = 0;
+        for (int i = 0; i &lt; num_processes; i++) {
+            if (finish[i] == 0) {
+                int j;
+                for (j = 0; j &lt; num_resources; j++) {
+                    if (need[i][j] &gt; work[j]) {
+                        break;
+                    }
+                }
+                
+                // If process i can be run
+                if (j == num_resources) {
+                    for (int k = 0; k &lt; num_resources; k++) {
+                        work[k] += allocation[i][k];
+                    }
+                    safe_sequence[count++] = i;
+                    finish[i] = 1;
+                    found = 1;
+                }
+            }
+        }
+        
+        // No safe sequence found
+        if (found == 0) {
+            return 0; 
+        }
+    }
+    
+    return 1; // System is in a safe state
+}
+
+int main() {
+    printf("Enter the number of processes: ");
+    scanf("%d", &amp;num_processes);
+    printf("Enter the number of resources: ");
+    scanf("%d", &amp;num_resources);
+
+    int available[num_resources];
+    int max[num_processes][10];
+    int allocation[num_processes][10];
+    int need[num_processes][10];
+    int safe_sequence[num_processes];
+
+    printf("\nEnter available resources:\n");
+    for (int i = 0; i &lt; num_resources; i++) {
+        printf("Resource %d: ", i);
+        scanf("%d", &amp;available[i]);
+    }
+
+    printf("\nEnter Allocation Matrix:\n");
+    for (int i = 0; i &lt; num_processes; i++) {
+        printf("Process %d: ", i);
+        for (int j = 0; j &lt; num_resources; j++) {
+            scanf("%d", &amp;allocation[i][j]);
+        }
+    }
+
+    printf("\nEnter Max Matrix:\n");
+    for (int i = 0; i &lt; num_processes; i++) {
+        printf("Process %d: ", i);
+        for (int j = 0; j &lt; num_resources; j++) {
+            scanf("%d", &amp;max[i][j]);
+            need[i][j] = max[i][j] - allocation[i][j];
+        }
+    }
+    
+    // Check if the system is in a safe state
+    if (is_safe(available, max, allocation, need, safe_sequence)) {
+        printf("\nSystem is in a SAFE state. Safe sequence: ");
+        for (int i = 0; i &lt; num_processes; i++) {
+            printf("P%d", safe_sequence[i]);
+            if (i &lt; num_processes - 1) {
+                printf(" -&gt; ");
+            }
+        }
+        printf("\n");
+    } else {
+        printf("\nSystem is in an UNSAFE state. Deadlock is possible.\n");
+    }
+
+    return 0;
+}
+  </code></pre>
+</body>
+</html>
